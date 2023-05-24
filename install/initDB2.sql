@@ -38,6 +38,7 @@ GRANT CREATE JOB to INVENTORYUSER;
 GRANT EXECUTE ON sys.DBMS_SCHEDULER TO INVENTORYUSER;
 GRANT create any edition,drop any edition to INVENTORYUSER;
 alter user INVENTORYUSER enable editions;
+grant create session, create table, create view to INVENTORYUSER;
 --This is all we want but table hasn't been created yet... GRANT select on AQ.inventoryqueuetable to INVENTORYUSER;
 GRANT SELECT ANY TABLE TO INVENTORYUSER;
 -- GRANT select on gv$session to INVENTORYUSER;
