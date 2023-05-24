@@ -5,11 +5,11 @@ metadata:
 spec:
   replicas: 3
   progressDeadlineSeconds: 600 # 滚动升级失败的超时时间
-  minReadySeconds: 10 # 需要容器就绪多久后才能认为可用，在可用前，滚动升级不会继续。这个可以用于控制滚动升级的速率
+  minReadySeconds: 60 # 需要容器就绪多久后才能认为可用，在可用前，滚动升级不会继续。这个可以用于控制滚动升级的速率
   strategy:
     rollingUpdate:
       maxSurge: 1 # 在期望副本数基础上，最多允许超出的pod实例数量，允许设置绝对值和百分比
-      maxUnavailable: 50% # 相对于期望副本数，允许有多少pod实例处于不可用状态，允许设置绝对值和百分比
+      maxUnavailable: 1 # 相对于期望副本数，允许有多少pod实例处于不可用状态，允许设置绝对值和百分比
   selector:
     matchLabels:
       app: supplier
