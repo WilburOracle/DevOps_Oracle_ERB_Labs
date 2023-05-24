@@ -1,0 +1,44 @@
+pipeline {
+    agent any
+    environment {
+        PROD_SCHEMA   = "INVENTORYUSER"
+        OCI_ADB_CREDS_PSW = "oracle"
+    }
+    stages {
+        stage('Prepare') {
+            steps {
+                echo "chmod"
+                sh('cd $WORKSPACE/deploy && chmod +x *.sh')
+                sh('git config --global user.email "wenbin.chen@oracle.com"')
+                sh('git config --global user.name "Wilbur"')
+           }
+        }
+        stage('Build Images') {
+            steps {
+                echo "Build Images"
+                sh('cd $WORKSPACE && mvn package')
+                sh('cd $WORKSPACE/deploy && ./pushImages.sh')
+           }
+        }
+        /*
+        stage('Change DB by Liquibase') {
+            steps {
+                echo "Change DB by Liquibase"
+                sh('cd $WORKSPACE/deploy && ./liquibase.sh')
+           }
+        }
+        */
+        stage('Database EBR') {
+            steps {
+                echo "Change DB"
+                sh('cd $WORKSPACE/deploy && ./ebr.sh')
+           }
+        }
+        stage('Generate Deploy Files') {
+            steps {
+                echo "Generate Deploy Files"
+                sh('cd $WORKSPACE/deploy && ./genDeployFiles.sh')
+           }
+        }
+    }
+}

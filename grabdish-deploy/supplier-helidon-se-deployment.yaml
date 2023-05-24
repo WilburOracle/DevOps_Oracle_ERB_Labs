@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: supplier-helidon-se
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: supplier
+  template:
+    metadata:
+      labels:
+        app: supplier
+        version: helidon-se
+    spec:
+      containers:
+      - name: supplier
+        image: labs.local:5000/supplier-helidon-se:0.0.1-SNAPSHOT
+        imagePullPolicy: Always
+        env:
+        - name: database.user
+          value: "INVENTORYUSER"
+        - name: database.url
+          value: "jdbc:oracle:thin:@labs.local:1521/ORCLPDB1"
+        - name: inventoryqueuename
+          value: "inventoryqueue"
+        - name: OCI_REGION
+          value: ""
+        - name: VAULT_SECRET_OCID
+          value: ""
+        - name: dbpassword
+          value: oracle
+        ports:
+        - containerPort: 8080
+      restartPolicy: Always

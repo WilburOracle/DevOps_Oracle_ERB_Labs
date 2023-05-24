@@ -1,0 +1,25 @@
+pipeline {
+    agent any
+    environment {
+        PROD_SCHEMA   = "INVENTORYUSER"
+        OCI_ADB_CREDS = credentials("ADB_ADMIN")
+        OCI_ADB_CREDS_PSW = "oracle"
+    }
+    stages {
+        stage('main-branch') {
+            when {
+                allOf {
+                    branch 'main'
+                    not { changeRequest target: 'main' }
+                }
+            }
+            steps {
+                echo "Updating Schema ${PROD_SCHEMA}"
+                sh('cd $WORKSPACE && mvn package')
+                sh('cd $WORKSPACE/deploy && ./pushImages.sh')
+                sh('cd $WORKSPACE/deploy && ./liquibase.py deploy --dbName $ADB_NAME --dbPass $OCI_ADB_CREDS_PSW --dbUser $PROD_SCHEMA')
+                sh('cd $WORKSPACE/deploy && ./genDeployFiles.sh')
+           }
+        }
+    }
+}

@@ -1,0 +1,41 @@
+## Copyright (c) 2021 Oracle and/or its affiliates.
+## Licensed under the Universal Permissive License v 1.0 as shown at https://oss.oracle.com/licenses/upl/
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: inventory-helidon
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: inventory
+  template:
+    metadata:
+      labels:
+        app: inventory
+        version: helidon
+    spec:
+      containers:
+        - name: inventory
+          image: labs.local:5000/inventory-helidon:0.0.1-SNAPSHOT
+          imagePullPolicy: Always
+          env:
+            - name: oracle.ucp.jdbc.PoolDataSource.inventorypdb.user
+              value: "inventoryuser"
+            - name: oracle.ucp.jdbc.PoolDataSource.inventorypdb.URL
+              value: "jdbc:oracle:thin:@labs.local:1521/ORCLPDB1"
+            - name: queueowner
+              value: "AQ"
+            - name: orderqueuename
+              value: "ORDERQUEUE"
+            - name: inventoryqueuename
+              value: "inventoryqueue"
+            - name: isSuggestiveSaleAIEnabled
+              value: "false"
+            - name: dbpassword
+              value: "oracle"
+            - name: edition
+              value: "ora$base"
+          ports:
+            - containerPort: 8080
+      restartPolicy: Always

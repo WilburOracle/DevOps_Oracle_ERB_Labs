@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: supplier-helidon-se
+spec:
+  replicas: 3
+  progressDeadlineSeconds: 600 # 滚动升级失败的超时时间
+  minReadySeconds: 10 # 需要容器就绪多久后才能认为可用，在可用前，滚动升级不会继续。这个可以用于控制滚动升级的速率
+  strategy:
+    rollingUpdate:
+      maxSurge: 1 # 在期望副本数基础上，最多允许超出的pod实例数量，允许设置绝对值和百分比
+      maxUnavailable: 50% # 相对于期望副本数，允许有多少pod实例处于不可用状态，允许设置绝对值和百分比
+  selector:
+    matchLabels:
+      app: supplier
+  template:
+    metadata:
+      labels:
+        app: supplier
+        version: helidon-se
+    spec:
+      containers:
+      - name: supplier
+        image: labs.local:5000/supplier-helidon-se:0.0.1-SNAPSHOT
+        imagePullPolicy: Always
+        env:
+        - name: database.user
+          value: "INVENTORYUSER"
+        - name: database.url
+          value: "jdbc:oracle:thin:@labs.local:1521/ORCLPDB1"
+        - name: inventoryqueuename
+          value: "inventoryqueue"
+        - name: OCI_REGION
+          value: ""
+        - name: VAULT_SECRET_OCID
+          value: ""
+        - name: dbpassword
+          value: oracle
+        - name: edition
+          value: "ora$base"
+        ports:
+        - containerPort: 8080
+      restartPolicy: Always
